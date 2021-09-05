@@ -30,7 +30,7 @@ model Post {
   title       String   @unique
   description String?
   publishedOn DateTime @db.Date
-  slug        String
+  slug        String   @unique
   Author      Author?  @relation(fields: [authorId], references: [id])
   authorId    String?
   ogImage     String?
