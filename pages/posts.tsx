@@ -29,6 +29,10 @@ const Posts: NextPage = () => {
         .finally(() => {
           setloading(false);
         });
+
+      setPosts(data);
+      setError(err);
+      setloading(false);
     };
 
     fetchData();
