@@ -1,9 +1,10 @@
-import axios from "axios";
 import type { NextPage } from "next";
 import Head from "next/head";
 import { useEffect, useState } from "react";
 import Image from "next/image";
 import { Post } from ".prisma/client";
+import useSWR from "swr";
+import { axiosFetcher } from "../util/axios";
 
 const Posts: NextPage = () => {
   const [posts, setPosts] = useState<Post[] | null>(null);
@@ -12,34 +13,25 @@ const Posts: NextPage = () => {
   const [search, setSearch] = useState("");
   const API_URL = "/api/posts";
 
-  useEffect(() => {
-    const params = {
-      search,
-    };
+  const handleOnError = async (e) => {
+    await setError(e);
+    await setloading(false);
+  };
+  const handleOnSuccess = async (data) => {
+    const { posts } = data;
+    await setPosts(posts);
+    await setloading(false);
+  };
 
-    const fetchData = () => {
-      axios
-        .post(API_URL, params)
-        .then((res) => {
-          setPosts(res.data);
-        })
-        .catch((err) => {
-          setError(err);
-        })
-        .finally(() => {
-          setloading(false);
-        });
+  useSWR({ url: API_URL, params: { search } }, axiosFetcher, {
+    onError: handleOnError,
+    onSuccess: handleOnSuccess,
+  });
 
-      setPosts(data);
-      setError(err);
-      setloading(false);
-    };
+  // console.log({ loading, error, posts });
 
-    fetchData();
-  }, [search]);
-
+  if (loading) return <div>Loading...</div>;
   if (error) return <div>An error occurred.</div>;
-  if (loading) return <div>Loading ...</div>;
   if (!posts) return <div>None Found...</div>;
 
   return (
@@ -58,7 +50,7 @@ const Posts: NextPage = () => {
           onChange={(e) => setSearch(e.target.value)}
         />
         <ul>
-          {posts.map((post) => (
+          {posts.map((post: Post) => (
             <li key={post.id}>
               <p>{post.title}</p>
               <Image

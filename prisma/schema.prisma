@@ -11,36 +11,31 @@ generator client {
   provider = "prisma-client-js"
 }
 
-model Author {
-  id        String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  createdAt DateTime @default(now())
-  updatedAt DateTime @default(now()) @updatedAt
-  email     String   @unique
-  firstName String
-  lastName  String
-  bio       String?
-  github    String?
-  twitter   String?
-  posts     Post[]
-}
-
 model Post {
-  id          String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @default(now()) @updatedAt
-  title       String   @unique
+  id          String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @default(now()) @updatedAt
+  title       String    @unique
   description String?
-  publishedOn DateTime @db.Date
-  slug        String   @unique
+  publishedOn DateTime  @db.Date
+  slug        String    @unique
   ogImage     String?
   coverImage  String
   filePath    String
   tags        Tag[]
-  Author      Author?  @relation(fields: [authorId], references: [id])
-  authorId    String?  @db.Uuid
+  category    Category? @relation(fields: [categoryId], references: [id])
+  categoryId  String?   @db.Uuid
 }
 
 model Tag {
+  id        String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now()) @updatedAt
+  name      String   @unique
+  posts     Post[]
+}
+
+model Category {
   id        String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   createdAt DateTime @default(now())
   updatedAt DateTime @default(now()) @updatedAt

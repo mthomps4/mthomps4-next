@@ -10,7 +10,6 @@ const findPost = async (req: NextApiRequest, res: NextApiResponse<Data>) => {
   const { slug } = req.query;
   const slugString = slug as string;
   const post = await prisma.post.findUnique({ where: { slug: slugString } });
-  prisma.$disconnect;
   res.status(200).json({ post });
 };
 

@@ -7,16 +7,17 @@ type Data = {
 };
 
 const findPosts = async (req: NextApiRequest, res: NextApiResponse<Data>) => {
-  const { search } = req.body;
+  const { search } = req.query;
+
   const posts = await prisma.post.findMany({
     where: {
       title: {
-        contains: search,
+        contains: search as string,
         mode: "insensitive",
       },
     },
   });
-  prisma.$disconnect;
+
   res.status(200).json({ posts });
 };
 
