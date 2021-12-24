@@ -1,11 +1,11 @@
-const { PrismaClient } = require("@prisma/client");
-const { slugify } = require("underscore.string");
-const path = require("path");
-const { readdir, readFile } = require("fs/promises");
+import { PrismaClient } from "@prisma/client";
+import { slugify } from "underscore.string";
+import path from "path";
+import { readdir, readFile } from "fs/promises";
 
 const prisma = new PrismaClient();
 
-const createPosts = async (postFolders) => {
+const createPosts = async (postFolders: string[]) => {
   return Promise.all(
     postFolders.map(async (dir) => {
       try {
@@ -13,7 +13,7 @@ const createPosts = async (postFolders) => {
           __dirname,
           `../public/posts/${dir}/meta.json`
         );
-        const jsonData = await readFile(jsonFilePath);
+        const jsonData = await readFile(jsonFilePath, "utf-8");
         const metaData = JSON.parse(jsonData);
 
         const post = await prisma.post.upsert({
@@ -30,7 +30,7 @@ const createPosts = async (postFolders) => {
           },
         });
         return `seeded post: ${post.title}`;
-      } catch (e) {
+      } catch (e: any) {
         return `Error creating post: ${dir}: ${e.message}`;
       }
     })

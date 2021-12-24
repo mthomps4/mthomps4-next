@@ -1,34 +1,35 @@
 import type { NextPage } from "next";
 import Head from "next/head";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import Image from "next/image";
 import { Post } from ".prisma/client";
 import useSWR from "swr";
 import { axiosFetcher } from "../util/axios";
-
+import Link from "next/link";
+interface Data {
+  posts: Post[];
+}
 const Posts: NextPage = () => {
   const [posts, setPosts] = useState<Post[] | null>(null);
   const [error, setError] = useState(null);
-  const [loading, setloading] = useState<boolean>(true);
+  const [loading, setLoading] = useState<boolean>(true);
   const [search, setSearch] = useState("");
   const API_URL = "/api/posts";
 
-  const handleOnError = async (e) => {
+  const handleOnError = async (e: any) => {
     await setError(e);
-    await setloading(false);
+    await setLoading(false);
   };
-  const handleOnSuccess = async (data) => {
+  const handleOnSuccess = async (data: Data) => {
     const { posts } = data;
     await setPosts(posts);
-    await setloading(false);
+    await setLoading(false);
   };
 
   useSWR({ url: API_URL, params: { search } }, axiosFetcher, {
     onError: handleOnError,
     onSuccess: handleOnSuccess,
   });
-
-  // console.log({ loading, error, posts });
 
   if (loading) return <div>Loading...</div>;
   if (error) return <div>An error occurred.</div>;
@@ -52,16 +53,20 @@ const Posts: NextPage = () => {
         <ul>
           {posts.map((post: Post) => (
             <li key={post.id}>
-              <p>{post.title}</p>
-              <Image
-                src={post.coverImage}
-                alt="post image"
-                loading="eager"
-                priority={true}
-                width={100}
-                height={100}
-                className="w-32 h-32 border-4 border-blue-400 drop-shadow-md"
-              />
+              <Link href={`/post/${post.id}`} passHref>
+                <div>
+                  <p>{post.title}</p>
+                  <Image
+                    src={post.coverImage}
+                    alt="post image"
+                    loading="eager"
+                    priority={true}
+                    width={100}
+                    height={100}
+                    className="w-32 h-32 border-4 border-blue-400 drop-shadow-md"
+                  />
+                </div>
+              </Link>
             </li>
           ))}
         </ul>

@@ -7,9 +7,13 @@ type Data = {
 };
 
 const findPost = async (req: NextApiRequest, res: NextApiResponse<Data>) => {
-  const { slug } = req.query;
-  const slugString = slug as string;
-  const post = await prisma.post.findUnique({ where: { slug: slugString } });
+  const { id } = req.query;
+
+  if (!id) {
+    return res.status(404).json({ post: null });
+  }
+
+  const post = await prisma.post.findUnique({ where: { id: id as string } });
   res.status(200).json({ post });
 };
 
