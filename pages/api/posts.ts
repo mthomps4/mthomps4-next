@@ -10,6 +10,7 @@ type Data = {
     nextPage: number | null;
     prevPage: number | null;
     totalPages: number;
+    currentPage: number;
   };
 };
 
@@ -45,7 +46,7 @@ const findPosts = async (req: NextApiRequest, res: NextApiResponse<Data>) => {
     orderBy,
   });
 
-  const totalPages = Math.round(count / take);
+  const totalPages = Math.ceil(count / take);
   const hasNext = pageNumber < totalPages;
   const hasPrev = pageNumber > 1;
   const nextPage = hasNext ? pageNumber + 1 : null;
@@ -57,6 +58,7 @@ const findPosts = async (req: NextApiRequest, res: NextApiResponse<Data>) => {
     nextPage,
     hasPrev,
     prevPage,
+    currentPage: pageNumber,
   };
 
   res.status(200).json({ posts, pageInfo });

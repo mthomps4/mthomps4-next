@@ -6,24 +6,44 @@ import { Post } from ".prisma/client";
 import useSWR from "swr";
 import { axiosFetcher } from "../util/axios";
 import Link from "next/link";
+
+interface PageInfo {
+  hasNext: boolean;
+  hasPrev: boolean;
+  nextPage: number | null;
+  prevPage: number | null;
+  totalPages: number;
+  currentPage: number;
+}
 interface Data {
   posts: Post[];
+  pageInfo: PageInfo;
 }
 const Posts: NextPage = () => {
   const [posts, setPosts] = useState<Post[] | null>(null);
   const [error, setError] = useState(null);
+  const [pageInfo, setPageInfo] = useState<PageInfo>({
+    hasNext: false,
+    hasPrev: false,
+    nextPage: null,
+    prevPage: null,
+    totalPages: 1,
+    currentPage: 1,
+  });
   const [loading, setLoading] = useState<boolean>(true);
   const [search, setSearch] = useState("");
   const API_URL = "/api/posts";
 
   const handleOnError = async (e: any) => {
-    await setError(e);
-    await setLoading(false);
+    setError(e);
+    setLoading(false);
   };
+
   const handleOnSuccess = async (data: Data) => {
-    const { posts } = data;
-    await setPosts(posts);
-    await setLoading(false);
+    const { posts, pageInfo } = data;
+    setPageInfo(pageInfo);
+    setPosts(posts);
+    setLoading(false);
   };
 
   useSWR({ url: API_URL, params: { search } }, axiosFetcher, {
@@ -34,6 +54,8 @@ const Posts: NextPage = () => {
   if (loading) return <div>Loading...</div>;
   if (error) return <div>An error occurred.</div>;
   if (!posts) return <div>None Found...</div>;
+
+  console.log({ pageInfo });
 
   return (
     <div className="">
@@ -70,6 +92,14 @@ const Posts: NextPage = () => {
             </li>
           ))}
         </ul>
+
+        <div>
+          <button>Prev</button>
+          <p>
+            Page {pageInfo.currentPage} of {pageInfo.totalPages}
+          </p>
+          <button>More</button>
+        </div>
       </main>
     </div>
   );
