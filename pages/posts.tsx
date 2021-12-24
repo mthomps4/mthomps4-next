@@ -6,6 +6,7 @@ import { Post } from ".prisma/client";
 import useSWR from "swr";
 import { axiosFetcher } from "../util/axios";
 import Link from "next/link";
+import { AxiosError } from "axios";
 
 interface PageInfo {
   hasNext: boolean;
@@ -21,7 +22,9 @@ interface Data {
 }
 const Posts: NextPage = () => {
   const [posts, setPosts] = useState<Post[] | null>(null);
-  const [error, setError] = useState(null);
+  const [error, setError] = useState<AxiosError | null>(null);
+  const [page, setPage] = useState<number | null>(1);
+  const [limit, setLimit] = useState<number>(5);
   const [pageInfo, setPageInfo] = useState<PageInfo>({
     hasNext: false,
     hasPrev: false,
@@ -34,19 +37,19 @@ const Posts: NextPage = () => {
   const [search, setSearch] = useState("");
   const API_URL = "/api/posts";
 
-  const handleOnError = async (e: any) => {
+  const handleOnError = (e: any) => {
     setError(e);
     setLoading(false);
   };
 
-  const handleOnSuccess = async (data: Data) => {
+  const handleOnSuccess = (data: Data) => {
     const { posts, pageInfo } = data;
     setPageInfo(pageInfo);
     setPosts(posts);
     setLoading(false);
   };
 
-  useSWR({ url: API_URL, params: { search } }, axiosFetcher, {
+  useSWR({ url: API_URL, params: { search, page, limit } }, axiosFetcher, {
     onError: handleOnError,
     onSuccess: handleOnSuccess,
   });
@@ -55,8 +58,26 @@ const Posts: NextPage = () => {
   if (error) return <div>An error occurred.</div>;
   if (!posts) return <div>None Found...</div>;
 
-  console.log({ pageInfo });
+  const handleNextPage = () => {
+    setPage(pageInfo.nextPage);
+  };
 
+  const handlePrevPage = () => {
+    setPage(pageInfo.prevPage);
+  };
+
+  const handleLimitChange = (e: any) => {
+    setPage(1);
+    setLimit(e.target.value);
+  };
+
+  const resetAll = () => {
+    setSearch("");
+    setPage(1);
+    setLimit(5);
+  };
+
+  console.log(pageInfo);
   return (
     <div className="">
       <Head>
@@ -72,6 +93,17 @@ const Posts: NextPage = () => {
           value={search}
           onChange={(e) => setSearch(e.target.value)}
         />
+
+        <label htmlFor="limitOptions">Limit</label>
+        <select id="limitOptions" onChange={handleLimitChange} value={limit}>
+          <option value={1}>1</option>
+          <option value={5}>5</option>
+          <option value={10}>10</option>
+          <option value={25}>25</option>
+        </select>
+
+        <button onClick={resetAll}>reset</button>
+
         <ul>
           {posts.map((post: Post) => (
             <li key={post.id}>
@@ -94,11 +126,15 @@ const Posts: NextPage = () => {
         </ul>
 
         <div>
-          <button>Prev</button>
+          <button onClick={handlePrevPage} disabled={!pageInfo.hasPrev}>
+            Prev
+          </button>
           <p>
             Page {pageInfo.currentPage} of {pageInfo.totalPages}
           </p>
-          <button>More</button>
+          <button onClick={handleNextPage} disabled={!pageInfo.hasNext}>
+            More
+          </button>
         </div>
       </main>
     </div>

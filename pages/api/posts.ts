@@ -15,7 +15,7 @@ type Data = {
 };
 
 const findPosts = async (req: NextApiRequest, res: NextApiResponse<Data>) => {
-  const { search, page = "1", limit = "5" } = req.query;
+  const { search, page = 1, limit = 5 } = req.query;
 
   const pageNumber = parseInt(page as string);
   const limitNumber = parseInt(limit as string);
@@ -32,7 +32,7 @@ const findPosts = async (req: NextApiRequest, res: NextApiResponse<Data>) => {
   };
 
   const take = limitNumber;
-  const skip = pageNumber * take;
+  const skip = (pageNumber - 1) * take;
 
   const posts = await prisma.post.findMany({
     where,
