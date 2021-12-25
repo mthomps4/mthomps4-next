@@ -26,10 +26,18 @@ interface Data {
   pageInfo: PageInfo;
 }
 const Posts: NextPage = () => {
+  // TOOD NOTES:
+  // Pagination Component takes Page Info
+  // Filter Component takes setParams callback, params passed to SWR, component manages internal state and callsback via useEffect
+  // Posts Component takes Post[]
+  // Audit Tailwind Container styles (tiny -> Large)
+
   const [posts, setPosts] = useState<Post[] | null>(null);
   const [error, setError] = useState<AxiosError | null>(null);
+  const [loading, setLoading] = useState<boolean>(true);
   const [page, setPage] = useState<number | null>(1);
   const [limit, setLimit] = useState<number>(5);
+  const [search, setSearch] = useState("");
   const [pageInfo, setPageInfo] = useState<PageInfo>({
     hasNext: false,
     hasPrev: false,
@@ -38,8 +46,6 @@ const Posts: NextPage = () => {
     totalPages: 1,
     currentPage: 1,
   });
-  const [loading, setLoading] = useState<boolean>(true);
-  const [search, setSearch] = useState("");
   const API_URL = "/api/posts";
 
   const handleOnError = (e: any) => {
