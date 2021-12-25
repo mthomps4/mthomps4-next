@@ -1,16 +1,16 @@
 ![title-image](/posts/2019-01-14-software_development_a_woodworkers_perspective/images/part1/IMG_3775.jpg){:.title-image}
 
-Photo by [Matt Thompson @3wirebuild](https://instagram.com/3wirebuild)
+Photo by [Matt Thompson @3wirebuild](https://instagram.com/3wirebuild)
 
 # Software Development: A Woodworkers Perspective (Part 1): Planning and Preparation
 
-If you read my intro article "Software Devlopment a Woodworkers Perspective", you’ll know I’ve been reading a lot of books about “Mastering your craft”. Along the way, I’ve found multiple cross-overs between what I aim to accomplish as a hobbyist and in my day-to-day as a software engineer. I decided to share these points as advice we hear over and over, this time as a woodworker rehashing the process it took to make a small box. If anything, maybe I’ll finally learn to apply these same principles I keep reading about. Maybe…
+If you read my intro article "Software Devlopment a Woodworkers Perspective", you’ll know I’ve been reading a lot of books about “Mastering your craft”. Along the way, I’ve found multiple cross-overs between what I aim to accomplish as a hobbyist and in my day-to-day as a software engineer. I decided to share these points as advice we hear over and over, this time as a woodworker rehashing the process it took to make a small box. If anything, maybe I’ll finally learn to apply these same principles I keep reading about. Maybe…
 
 > Take the time, you’ll thank yourself later
 
 ## **Planning and Preparation**
 
-It goes without saying, the best thing you can do before starting any project is to *think it through*. Take the request and whiteboard, napkin sketch, whatever it takes to think about the end goal. It doesn’t have to be pretty, just make the effort. Walk away, come back later, and do it all again. You’ll see something new every time, typically with the inner voice of “What was I thinking?” It’s easy to fall into the traps built by your own ego and confidence. Something along the lines of “This shouldn’t be that hard…” or “I can figure this part out as I go…” If you find yourself making these comments, do yourself a favor and stop. While you may be okay, it’s only a matter of time before errors occur. This is a game of “when will I screw up” not “will I”. Make a mental note and grab some coffee. Take the time, you’ll thank yourself later.
+It goes without saying, the best thing you can do before starting any project is to *think it through*. Take the request and whiteboard, napkin sketch, whatever it takes to think about the end goal. It doesn’t have to be pretty, just make the effort. Walk away, come back later, and do it all again. You’ll see something new every time, typically with the inner voice of “What was I thinking?” It’s easy to fall into the traps built by your own ego and confidence. Something along the lines of “This shouldn’t be that hard…” or “I can figure this part out as I go…” If you find yourself making these comments, do yourself a favor and stop. While you may be okay, it’s only a matter of time before errors occur. This is a game of “when will I screw up” not “will I”. Make a mental note and grab some coffee. Take the time, you’ll thank yourself later.
 
 Preparation doesn’t have to be pretty…
 
