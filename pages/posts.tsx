@@ -5,12 +5,11 @@ import Image from "next/image";
 import { Post } from ".prisma/client";
 import useSWR from "swr";
 import { axiosFetcher } from "../util/axios";
-import Link from "next/link";
 import { AxiosError } from "axios";
 import {
   ArrowNarrowLeftIcon,
   ArrowNarrowRightIcon,
-  SearchIcon,
+  FilterIcon,
 } from "@heroicons/react/solid";
 
 interface PageInfo {
@@ -26,18 +25,18 @@ interface Data {
   pageInfo: PageInfo;
 }
 const Posts: NextPage = () => {
-  // TOOD NOTES:
-  // Pagination Component takes Page Info
-  // Filter Component takes setParams callback, params passed to SWR, component manages internal state and callsback via useEffect
-  // Posts Component takes Post[]
-  // Audit Tailwind Container styles (tiny -> Large)
-
+  // main
   const [posts, setPosts] = useState<Post[] | null>(null);
   const [error, setError] = useState<AxiosError | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
-  const [page, setPage] = useState<number | null>(1);
+
+  // filters
+  const [showFilters, setShowFilters] = useState<boolean>(false);
+  const [page, setPage] = useState<number>(1);
   const [limit, setLimit] = useState<number>(5);
   const [search, setSearch] = useState("");
+
+  // pagination
   const [pageInfo, setPageInfo] = useState<PageInfo>({
     hasNext: false,
     hasPrev: false,
@@ -46,6 +45,7 @@ const Posts: NextPage = () => {
     totalPages: 1,
     currentPage: 1,
   });
+
   const API_URL = "/api/posts";
 
   const handleOnError = (e: any) => {
@@ -70,11 +70,15 @@ const Posts: NextPage = () => {
   if (!posts) return <div>None Found...</div>;
 
   const handleNextPage = () => {
-    setPage(pageInfo.nextPage);
+    if (pageInfo.nextPage) {
+      setPage(pageInfo.nextPage);
+    }
   };
 
   const handlePrevPage = () => {
-    setPage(pageInfo.prevPage);
+    if (pageInfo.prevPage) {
+      setPage(pageInfo.prevPage);
+    }
   };
 
   const handleLimitChange = (e: any) => {
@@ -88,7 +92,6 @@ const Posts: NextPage = () => {
     setLimit(5);
   };
 
-  console.log(pageInfo);
   return (
     <>
       <Head>
@@ -101,139 +104,112 @@ const Posts: NextPage = () => {
       <main className="">
         <h1 className="text-blue-500 text-4xl font-bold text-center">Posts</h1>
 
-        <div className="bg-gray-300 py-4 w-full flex justify-around items-end">
-          <div className="w-full mx-2 sm:w-1/4">
-            <label
-              htmlFor="search"
-              className="block text-sm font-medium text-gray-700"
-            >
-              Search
-            </label>
+        <div className="flex justify-around items-center bg-gray-200 p-2">
+          <div className="w-full">
             <input
               id="search"
               className="focus:ring-indigo-500 focus:border-indigo-500 block w-full py-2 px-3 sm:text-sm border-gray-300 rounded-md"
-              placeholder="Cool Blog Title"
+              placeholder="Search..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
             />
           </div>
-
-          <div className="hidden sm:block">
-            <label
-              htmlFor="limitOptions"
-              className="block text-sm font-medium text-gray-700"
-            >
-              Page Size
-            </label>
-            <select
-              id="limitOptions"
-              className="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md"
-              onChange={handleLimitChange}
-              value={limit}
-            >
-              <option value={1}>1</option>
-              <option value={5}>5</option>
-              <option value={10}>10</option>
-              <option value={25}>25</option>
-            </select>
-          </div>
-
-          <div className="hidden sm:block">
-            <label
-              htmlFor="categoryFilter"
-              className="block text-sm font-medium text-gray-700"
-            >
-              Category
-            </label>
-            <select
-              id="categoryFilter"
-              className="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md"
-              // onChange={handleLimitChange}
-              // value={limit}
-            >
-              <option value={1}>TODO</option>
-            </select>
-          </div>
-
-          <div className="hidden sm:block">
-            <label
-              htmlFor="tagFilter"
-              className="block text-sm font-medium text-gray-700"
-            >
-              Tab
-            </label>
-            <select
-              id="tagFilter"
-              className="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md"
-              // onChange={handleLimitChange}
-              // value={limit}
-            >
-              <option value={1}>TODO</option>
-            </select>
-          </div>
-
-          <div className="hidden sm:block">
-            <button
-              onClick={resetAll}
-              className="inline-flex items-center px-6 py-3 border border-gray-300 shadow-sm text-xs font-medium rounded-full text-gray-700 bg-gray-400 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-            >
-              reset
-            </button>
-          </div>
+          <FilterIcon
+            className="mx-3 h-5 w-5 text-gray-400 hover:text-blue-500"
+            aria-hidden="true"
+            onClick={() => setShowFilters(!showFilters)}
+          />
         </div>
 
-        <nav className="bg-gray-100 px-4 py-2 flex items-center justify-between sm:px-0">
-          <div className="-mt-px w-0 flex-1 flex">
-            <button
-              onClick={handlePrevPage}
-              disabled={!pageInfo.hasPrev}
-              className="border-t-2 border-transparent pt-4 pr-1 inline-flex items-center text-sm font-medium text-gray-500 hover:text-blue-700 hover:border-blue-300 disabled:hover:border-gray-300 disabled:hover:text-gray-300 disabled:opacity-75 disabled:cursor-not-allowed"
-            >
-              <ArrowNarrowLeftIcon
-                className="mr-3 h-5 w-5 text-gray-400 hover:text-blue-300"
-                aria-hidden="true"
-              />
-              Previous
-            </button>
-          </div>
-          <div className="hidden md:-mt-px md:flex">
-            <p className="text-sm text-gray-700">
-              Page {pageInfo.currentPage} of {pageInfo.totalPages}
-            </p>
-          </div>
-          <div className="-mt-px w-0 flex-1 flex justify-end">
-            <button
-              onClick={handleNextPage}
-              disabled={!pageInfo.hasNext}
-              className="border-t-2 border-transparent pt-4 pl-1 inline-flex items-center text-sm font-medium text-gray-500 hover:text-blue-700 hover:border-blue-300 disabled:hover:border-gray-300 disabled:hover:text-gray-300 disabled:opacity-75 disabled:cursor-not-allowed"
-            >
-              Next
-              <ArrowNarrowRightIcon
-                className="ml-3 h-5 w-5 text-gray-400 hover:text-blue-300"
-                aria-hidden="true"
-              />
-            </button>
-          </div>
-        </nav>
+        {showFilters && (
+          <div className="bg-gray-100 md:flex md:justify-around md:items-end py-4">
+            <div className="mx-2">
+              <label
+                htmlFor="limitOptions"
+                className="block text-sm font-medium text-gray-700"
+              >
+                Page Size
+              </label>
+              <select
+                id="limitOptions"
+                className="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md"
+                onChange={handleLimitChange}
+                value={limit}
+              >
+                <option value={1}>1</option>
+                <option value={5}>5</option>
+                <option value={10}>10</option>
+                <option value={25}>25</option>
+              </select>
+            </div>
 
-        <div className="mt-12 max-w-lg mx-auto grid gap-5 lg:grid-cols-3 lg:max-w-none">
+            <div className="mx-2">
+              <label
+                htmlFor="categoryFilter"
+                className="block text-sm font-medium text-gray-700"
+              >
+                Category
+              </label>
+              <select
+                id="categoryFilter"
+                className="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md"
+                // onChange={handleCategoryChange}
+                // value={category}
+              >
+                <option value={1}>TODO</option>
+              </select>
+            </div>
+
+            <div className="mx-2">
+              <label
+                htmlFor="tagFilter"
+                className="block text-sm font-medium text-gray-700"
+              >
+                Tags
+              </label>
+              {/* TODO: React MultiSelect */}
+              <select
+                id="tagFilter"
+                className="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md"
+                // onChange={handleTagChange}
+                // value={tag}
+              >
+                <option value={1}>TODO: Multiselect</option>
+              </select>
+            </div>
+
+            <div className=" m-2 flex justify-end sm:flex-none sm:my-0">
+              <button
+                onClick={resetAll}
+                className="inline-flex items-center px-6 py-3 border border-gray-300 shadow-sm text-xs font-medium rounded-full text-gray-700 bg-gray-400 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+              >
+                reset
+              </button>
+            </div>
+          </div>
+        )}
+
+        <div className="my-3 max-w-lg mx-auto grid gap-5 lg:grid-cols-3 lg:max-w-none">
           {posts.map((post) => (
             <div
               key={post.title}
               className="flex flex-col rounded-lg shadow-lg overflow-hidden mx-3"
             >
               <div className="flex-shrink-0">
-                <img
-                  className="h-48 w-full object-cover"
-                  src={post.coverImage}
-                  alt=""
-                />
+                <div className="image-container w-full h-48 relative">
+                  <Image
+                    src={post.coverImage}
+                    alt={`Title Image: ${post.title}`}
+                    layout="fill"
+                    objectFit="cover"
+                  />
+                </div>
               </div>
               <div className="flex-1 bg-white p-6 flex flex-col justify-between">
                 <div className="flex-1">
                   <p className="text-sm font-medium text-indigo-600">
                     <a href={"#"} className="hover:underline">
-                      "post.category.name"
+                      post.category.name
                     </a>
                   </p>
                   <a href={`/post/${post.id}`} className="block mt-2">
@@ -252,8 +228,6 @@ const Posts: NextPage = () => {
                         Published On:{" "}
                         {new Date(post.publishedOn).toLocaleDateString()}
                       </p>
-                      {/* <span aria-hidden="true">&middot;</span>
-                      <span>3 min read</span> */}
                     </div>
                   </div>
                 </div>
@@ -261,6 +235,39 @@ const Posts: NextPage = () => {
             </div>
           ))}
         </div>
+        <nav className="bg-gray-100 p-4 flex items-center justify-between sm:px-0">
+          <div className="-mt-px w-0 flex-1 flex">
+            <button
+              onClick={handlePrevPage}
+              disabled={!pageInfo.hasPrev}
+              className="border-t-2 border-transparent pr-1 inline-flex items-center text-sm font-medium text-gray-500 hover:text-blue-700 hover:border-blue-300 disabled:hover:border-gray-300 disabled:hover:text-gray-300 disabled:opacity-75 disabled:cursor-not-allowed"
+            >
+              <ArrowNarrowLeftIcon
+                className="mr-3 h-5 w-5 text-gray-400 hover:text-blue-300"
+                aria-hidden="true"
+              />
+              Previous
+            </button>
+          </div>
+          <div className="md:-mt-px md:flex">
+            <p className="text-sm text-gray-700">
+              Page {pageInfo.currentPage} of {pageInfo.totalPages}
+            </p>
+          </div>
+          <div className="-mt-px w-0 flex-1 flex justify-end">
+            <button
+              onClick={handleNextPage}
+              disabled={!pageInfo.hasNext}
+              className="border-t-2 border-transparent pl-1 inline-flex items-center text-sm font-medium text-gray-500 hover:text-blue-700 hover:border-blue-300 disabled:hover:border-gray-300 disabled:hover:text-gray-300 disabled:opacity-75 disabled:cursor-not-allowed"
+            >
+              Next
+              <ArrowNarrowRightIcon
+                className="ml-3 h-5 w-5 text-gray-400 hover:text-blue-300"
+                aria-hidden="true"
+              />
+            </button>
+          </div>
+        </nav>
       </main>
     </>
   );
